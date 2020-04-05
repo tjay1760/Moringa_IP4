@@ -1,0 +1,1553 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Moringa_DataScience_Indipendent_Project4_John_Thiongo.ipynb",
+      "provenance": [],
+      "toc_visible": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "mDAJ6-9x7mFp",
+        "colab_type": "text"
+      },
+      "source": [
+        "# **Indipendent Project 4**\n",
+        "Blue cars Usage\n",
+        "Working as a data scientist for an electric car-sharing service company, I have been tasked to process stations data to understand electric car usage over time "
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "pyXEocd28S_G",
+        "colab_type": "text"
+      },
+      "source": [
+        "Research Question: Identify the most popular hour of the day for picking up a shared electric car (Bluecar) in the city of Paris over the month of April 2018."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "PgNBuCrZ8ttC",
+        "colab_type": "text"
+      },
+      "source": [
+        "***Bonus Questions***\n",
+        "1. What is the most popular hour for returning cars?\n",
+        "\n",
+        "2. What station is the most popular\n",
+        "  Overall?\n",
+        "  At the most popular picking hour?\n",
+        "3. What postal code is the most popular for picking up Blue cars? Does the most popular station belong to that postal code?\n",
+        "  Overall?\n",
+        "  At the most popular picking hour?\n",
+        "4. Do the results change if you consider Utilib and Utilib 1.4 instead of Blue cars? \n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xyukusMY9nub",
+        "colab_type": "text"
+      },
+      "source": [
+        "The dataset description for this project: [http://bit.ly/autolib_dataset (Links to an external site.)] \n",
+        "DAta for the project [Link] (Links to an external site.).  The dataset contains data collected for a period of 9 days. "
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "4qh5AK5x-OQm",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "# Importing the datasets to be used\n",
+        "import pandas as pd\n",
+        "import numpy as np"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "IPQw2KGO-fB9",
+        "colab_type": "code",
+        "outputId": "d8ac8069-f142-4013-a331-297d69bfe2bf",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 753
+        }
+      },
+      "source": [
+        "# Loading the dataset to the current Work space\n",
+        "cars_df = pd.read_csv(\"/content/Autolib_dataset (2).csv\")\n",
+        "cars_df.head(10)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Address</th>\n",
+              "      <th>Cars</th>\n",
+              "      <th>Bluecar counter</th>\n",
+              "      <th>Utilib counter</th>\n",
+              "      <th>Utilib 1.4 counter</th>\n",
+              "      <th>Charge Slots</th>\n",
+              "      <th>Charging Status</th>\n",
+              "      <th>City</th>\n",
+              "      <th>Displayed comment</th>\n",
+              "      <th>ID</th>\n",
+              "      <th>Kind</th>\n",
+              "      <th>Geo point</th>\n",
+              "      <th>Postal code</th>\n",
+              "      <th>Public name</th>\n",
+              "      <th>Rental status</th>\n",
+              "      <th>Scheduled at</th>\n",
+              "      <th>Slots</th>\n",
+              "      <th>Station type</th>\n",
+              "      <th>Status</th>\n",
+              "      <th>Subscription status</th>\n",
+              "      <th>year</th>\n",
+              "      <th>month</th>\n",
+              "      <th>day</th>\n",
+              "      <th>hour</th>\n",
+              "      <th>minute</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>2 Avenue de Suffren</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-suffren-2</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.857, 2.2917</td>\n",
+              "      <td>75015</td>\n",
+              "      <td>Paris/Suffren/2</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>11</td>\n",
+              "      <td>43</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>145 Rue Raymond Losserand</td>\n",
+              "      <td>6</td>\n",
+              "      <td>6</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-raymondlosserand-145</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.83126, 2.313088</td>\n",
+              "      <td>75014</td>\n",
+              "      <td>Paris/Raymond Losserand/145</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>6</td>\n",
+              "      <td>7</td>\n",
+              "      <td>24</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>2 Avenue John Fitzgerald Kennedy</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>0</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>Le Bourget</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>lebourget-johnfitzgeraldkennedy-2</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.938103, 2.4286035</td>\n",
+              "      <td>93350</td>\n",
+              "      <td>Le Bourget/John Fitzgerald Kennedy/2</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>3</td>\n",
+              "      <td>20</td>\n",
+              "      <td>14</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>51 Rue EugÃ¨ne OudinÃ©</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-eugeneoudine-51</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.8250327, 2.3725162</td>\n",
+              "      <td>75013</td>\n",
+              "      <td>Paris/EugÃ¨ne OudinÃ©/51</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>4</td>\n",
+              "      <td>4</td>\n",
+              "      <td>37</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>6 avenue de la Porte de Champerret</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-portedechamperret-6</td>\n",
+              "      <td>PARKING</td>\n",
+              "      <td>48.8862632, 2.2874511</td>\n",
+              "      <td>75017</td>\n",
+              "      <td>Paris/Porte de Champerret/6</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>3</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>17</td>\n",
+              "      <td>23</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>5</th>\n",
+              "      <td>8 Boulevard Voltaire</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-voltaire-8</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.8657658, 2.3664376</td>\n",
+              "      <td>75011</td>\n",
+              "      <td>Paris/Voltaire/8</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>6</td>\n",
+              "      <td>7</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>6</th>\n",
+              "      <td>37 rue Leblanc</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>Station en parking (niv -1), accÃ¨s 37 rue Leb...</td>\n",
+              "      <td>paris-citroencevennes-parking</td>\n",
+              "      <td>PARKING</td>\n",
+              "      <td>48.83874, 2.27641</td>\n",
+              "      <td>75015</td>\n",
+              "      <td>Paris/CitroÃ«n CÃ©vennes/Parking</td>\n",
+              "      <td>broken</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "      <td>station</td>\n",
+              "      <td>closed</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>18</td>\n",
+              "      <td>20</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>7</th>\n",
+              "      <td>17 Rue des Luaps ProlongÃ©e</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Nanterre</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>nanterre-luaps-17</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.88069, 2.21063</td>\n",
+              "      <td>92000</td>\n",
+              "      <td>Nanterre/Luaps/17</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>4</td>\n",
+              "      <td>22</td>\n",
+              "      <td>13</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>8</th>\n",
+              "      <td>34 avenue Jean Moulin</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-jeanmoulin-34</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.8266807, 2.3237355</td>\n",
+              "      <td>75014</td>\n",
+              "      <td>Paris/Jean Moulin/34</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>2</td>\n",
+              "      <td>22</td>\n",
+              "      <td>58</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9</th>\n",
+              "      <td>41 boulevard de Rochechouart</td>\n",
+              "      <td>6</td>\n",
+              "      <td>6</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-anvers-parking</td>\n",
+              "      <td>PARKING</td>\n",
+              "      <td>48.88267, 2.34405</td>\n",
+              "      <td>75009</td>\n",
+              "      <td>Paris/Anvers/Parking</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>4</td>\n",
+              "      <td>15</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                              Address  Cars  Bluecar counter  ...  day  hour  minute\n",
+              "0                 2 Avenue de Suffren     0                0  ...    8    11      43\n",
+              "1           145 Rue Raymond Losserand     6                6  ...    6     7      24\n",
+              "2    2 Avenue John Fitzgerald Kennedy     3                3  ...    3    20      14\n",
+              "3              51 Rue EugÃ¨ne OudinÃ©     3                3  ...    4     4      37\n",
+              "4  6 avenue de la Porte de Champerret     3                3  ...    8    17      23\n",
+              "5                8 Boulevard Voltaire     0                0  ...    6     7       2\n",
+              "6                      37 rue Leblanc     0                0  ...    8    18      20\n",
+              "7         17 Rue des Luaps ProlongÃ©e     3                3  ...    4    22      13\n",
+              "8               34 avenue Jean Moulin     1                1  ...    2    22      58\n",
+              "9        41 boulevard de Rochechouart     6                6  ...    4    15       2\n",
+              "\n",
+              "[10 rows x 25 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_vuMXECkAwtH",
+        "colab_type": "code",
+        "outputId": "a9a3515d-d68f-4b0e-ce97-0f52d2459470",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 459
+        }
+      },
+      "source": [
+        "# Checking data types\n",
+        "cars_df.dtypes "
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Address                object\n",
+              "Cars                    int64\n",
+              "Bluecar counter         int64\n",
+              "Utilib counter          int64\n",
+              "Utilib 1.4 counter      int64\n",
+              "Charge Slots            int64\n",
+              "Charging Status        object\n",
+              "City                   object\n",
+              "Displayed comment      object\n",
+              "ID                     object\n",
+              "Kind                   object\n",
+              "Geo point              object\n",
+              "Postal code             int64\n",
+              "Public name            object\n",
+              "Rental status          object\n",
+              "Scheduled at           object\n",
+              "Slots                   int64\n",
+              "Station type           object\n",
+              "Status                 object\n",
+              "Subscription status    object\n",
+              "year                    int64\n",
+              "month                   int64\n",
+              "day                     int64\n",
+              "hour                    int64\n",
+              "minute                  int64\n",
+              "dtype: object"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "FrobeeCEBgmr",
+        "colab_type": "text"
+      },
+      "source": [
+        "**Cleaning Data**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "T1kimmXSBnwk",
+        "colab_type": "code",
+        "outputId": "869099ae-cf59-40d7-fa3c-7243f74c134c",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 216
+        }
+      },
+      "source": [
+        "# Converting column names to lower case\n",
+        "cars_df.columns = map(str.lower, cars_df.columns)\n",
+        "cars_df.head(2)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>address</th>\n",
+              "      <th>cars</th>\n",
+              "      <th>bluecar counter</th>\n",
+              "      <th>utilib counter</th>\n",
+              "      <th>utilib 1.4 counter</th>\n",
+              "      <th>charge slots</th>\n",
+              "      <th>charging status</th>\n",
+              "      <th>city</th>\n",
+              "      <th>displayed comment</th>\n",
+              "      <th>id</th>\n",
+              "      <th>kind</th>\n",
+              "      <th>geo point</th>\n",
+              "      <th>postal code</th>\n",
+              "      <th>public name</th>\n",
+              "      <th>rental status</th>\n",
+              "      <th>scheduled at</th>\n",
+              "      <th>slots</th>\n",
+              "      <th>station type</th>\n",
+              "      <th>status</th>\n",
+              "      <th>subscription status</th>\n",
+              "      <th>year</th>\n",
+              "      <th>month</th>\n",
+              "      <th>day</th>\n",
+              "      <th>hour</th>\n",
+              "      <th>minute</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>2 Avenue de Suffren</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-suffren-2</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.857, 2.2917</td>\n",
+              "      <td>75015</td>\n",
+              "      <td>Paris/Suffren/2</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>11</td>\n",
+              "      <td>43</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>145 Rue Raymond Losserand</td>\n",
+              "      <td>6</td>\n",
+              "      <td>6</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-raymondlosserand-145</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.83126, 2.313088</td>\n",
+              "      <td>75014</td>\n",
+              "      <td>Paris/Raymond Losserand/145</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>6</td>\n",
+              "      <td>7</td>\n",
+              "      <td>24</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                     address  cars  bluecar counter  ...  day  hour  minute\n",
+              "0        2 Avenue de Suffren     0                0  ...    8    11      43\n",
+              "1  145 Rue Raymond Losserand     6                6  ...    6     7      24\n",
+              "\n",
+              "[2 rows x 25 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Ivhi8iwlgrO5",
+        "colab_type": "code",
+        "outputId": "b18bd685-9003-4044-d858-320a38cf3066",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 182
+        }
+      },
+      "source": [
+        "# Removing spaces in titles\n",
+        "cars_df.columns = cars_df.columns.str.replace (\" \", \"_\"). str.replace(\".\",\"\").str.strip()\n",
+        "cars_df.head(2)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>address</th>\n",
+              "      <th>cars</th>\n",
+              "      <th>bluecar_counter</th>\n",
+              "      <th>utilib_counter</th>\n",
+              "      <th>utilib_14_counter</th>\n",
+              "      <th>charge_slots</th>\n",
+              "      <th>charging_status</th>\n",
+              "      <th>city</th>\n",
+              "      <th>displayed_comment</th>\n",
+              "      <th>id</th>\n",
+              "      <th>kind</th>\n",
+              "      <th>geo_point</th>\n",
+              "      <th>postal_code</th>\n",
+              "      <th>public_name</th>\n",
+              "      <th>rental_status</th>\n",
+              "      <th>scheduled_at</th>\n",
+              "      <th>slots</th>\n",
+              "      <th>station_type</th>\n",
+              "      <th>status</th>\n",
+              "      <th>subscription_status</th>\n",
+              "      <th>year</th>\n",
+              "      <th>month</th>\n",
+              "      <th>day</th>\n",
+              "      <th>hour</th>\n",
+              "      <th>minute</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>2 Avenue de Suffren</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-suffren-2</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.857, 2.2917</td>\n",
+              "      <td>75015</td>\n",
+              "      <td>Paris/Suffren/2</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>11</td>\n",
+              "      <td>43</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>145 Rue Raymond Losserand</td>\n",
+              "      <td>6</td>\n",
+              "      <td>6</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>paris-raymondlosserand-145</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>48.83126, 2.313088</td>\n",
+              "      <td>75014</td>\n",
+              "      <td>Paris/Raymond Losserand/145</td>\n",
+              "      <td>operational</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "      <td>station</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>6</td>\n",
+              "      <td>7</td>\n",
+              "      <td>24</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                     address  cars  bluecar_counter  ...  day  hour  minute\n",
+              "0        2 Avenue de Suffren     0                0  ...    8    11      43\n",
+              "1  145 Rue Raymond Losserand     6                6  ...    6     7      24\n",
+              "\n",
+              "[2 rows x 25 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wJk6OulDi21R",
+        "colab_type": "code",
+        "outputId": "c03cb28d-a396-4fce-fc2f-0f3ea4414f91",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 68
+        }
+      },
+      "source": [
+        "# Checking for duplicates columns\n",
+        "cars_df.columns.duplicated()"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([False, False, False, False, False, False, False, False, False,\n",
+              "       False, False, False, False, False, False, False, False, False,\n",
+              "       False, False, False, False, False, False, False])"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "WE03iwnBpfkA",
+        "colab_type": "code",
+        "outputId": "72cb8b58-a2fb-4fce-ba0e-be8538a1f958",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 459
+        }
+      },
+      "source": [
+        "#Checking columns with NA values\n",
+        "cars_df.isna().sum()"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "address                   0\n",
+              "cars                      0\n",
+              "bluecar_counter           0\n",
+              "utilib_counter            0\n",
+              "utilib_14_counter         0\n",
+              "charge_slots              0\n",
+              "charging_status           0\n",
+              "city                      0\n",
+              "displayed_comment      4889\n",
+              "id                        0\n",
+              "kind                      0\n",
+              "geo_point                 0\n",
+              "postal_code               0\n",
+              "public_name               0\n",
+              "rental_status             0\n",
+              "scheduled_at           4953\n",
+              "slots                     0\n",
+              "station_type              0\n",
+              "status                    0\n",
+              "subscription_status       0\n",
+              "year                      0\n",
+              "month                     0\n",
+              "day                       0\n",
+              "hour                      0\n",
+              "minute                    0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Ewr3kTvtq5Ys",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#drop columns with NA values\n",
+        "cars_df = cars_df.drop([\"displayed_comment\",\"scheduled_at\"], axis=1)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ojua67iA00Z2",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#Drop irrelevant columns\n",
+        "cars_df=cars_df.drop([\"slots\",\"charging_status\",\"id\",\"geo_point\",\"rental_status\",\"station_type\"], axis=1)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-CGB1oqMx6Km",
+        "colab_type": "code",
+        "outputId": "101bb846-0913-4cc1-a26b-27fdc39f8dbd",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        }
+      },
+      "source": [
+        "#Drop duplicate rows\n",
+        "cars_df.drop_duplicates(keep=\"first\",inplace=True)\n",
+        "cars_df.shape"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(5000, 17)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "rUfELqjp3tl3",
+        "colab_type": "code",
+        "outputId": "ad28aaa6-0bf7-468c-8059-d6400ffa9f71",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 411
+        }
+      },
+      "source": [
+        "#viewing our dataset\n",
+        "cars_df.head(5)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>address</th>\n",
+              "      <th>cars</th>\n",
+              "      <th>bluecar_counter</th>\n",
+              "      <th>utilib_counter</th>\n",
+              "      <th>utilib_14_counter</th>\n",
+              "      <th>charge_slots</th>\n",
+              "      <th>city</th>\n",
+              "      <th>kind</th>\n",
+              "      <th>postal_code</th>\n",
+              "      <th>public_name</th>\n",
+              "      <th>status</th>\n",
+              "      <th>subscription_status</th>\n",
+              "      <th>year</th>\n",
+              "      <th>month</th>\n",
+              "      <th>day</th>\n",
+              "      <th>hour</th>\n",
+              "      <th>minute</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>2 Avenue de Suffren</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>75015</td>\n",
+              "      <td>Paris/Suffren/2</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>11</td>\n",
+              "      <td>43</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>145 Rue Raymond Losserand</td>\n",
+              "      <td>6</td>\n",
+              "      <td>6</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>75014</td>\n",
+              "      <td>Paris/Raymond Losserand/145</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>6</td>\n",
+              "      <td>7</td>\n",
+              "      <td>24</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>2 Avenue John Fitzgerald Kennedy</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>0</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Le Bourget</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>93350</td>\n",
+              "      <td>Le Bourget/John Fitzgerald Kennedy/2</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>3</td>\n",
+              "      <td>20</td>\n",
+              "      <td>14</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>51 Rue EugÃ¨ne OudinÃ©</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>STATION</td>\n",
+              "      <td>75013</td>\n",
+              "      <td>Paris/EugÃ¨ne OudinÃ©/51</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>4</td>\n",
+              "      <td>4</td>\n",
+              "      <td>37</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>6 avenue de la Porte de Champerret</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Paris</td>\n",
+              "      <td>PARKING</td>\n",
+              "      <td>75017</td>\n",
+              "      <td>Paris/Porte de Champerret/6</td>\n",
+              "      <td>ok</td>\n",
+              "      <td>nonexistent</td>\n",
+              "      <td>2018</td>\n",
+              "      <td>4</td>\n",
+              "      <td>8</td>\n",
+              "      <td>17</td>\n",
+              "      <td>23</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                              address  cars  bluecar_counter  ...  day  hour  minute\n",
+              "0                 2 Avenue de Suffren     0                0  ...    8    11      43\n",
+              "1           145 Rue Raymond Losserand     6                6  ...    6     7      24\n",
+              "2    2 Avenue John Fitzgerald Kennedy     3                3  ...    3    20      14\n",
+              "3              51 Rue EugÃ¨ne OudinÃ©     3                3  ...    4     4      37\n",
+              "4  6 avenue de la Porte de Champerret     3                3  ...    8    17      23\n",
+              "\n",
+              "[5 rows x 17 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "omdhF50V3MlN",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Data Analysis"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "2a5tGNh1LAqP",
+        "colab_type": "text"
+      },
+      "source": [
+        "Identify the most popular hour of the day for picking up a shared electric car (Bluecar) in the city of Paris over the month of April 2018."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "YaNsFdTMLW8p",
+        "colab_type": "code",
+        "outputId": "8a650c4b-2b8f-4d83-d252-6d30ec38258a",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 68
+        }
+      },
+      "source": [
+        "cars_df[(cars_df[\"city\"]==\"Paris\") & (cars_df[\"cars\"]<7)& (cars_df.month== 4) & (cars_df.year==2018)]. groupby(\"hour\")[\"hour\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "hour\n",
+              "21    147\n",
+              "Name: hour, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 21
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "MxAayflL3bUB",
+        "colab_type": "text"
+      },
+      "source": [
+        "What is the most popular hour for returning cars?\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "irkwspBg3kd-",
+        "colab_type": "code",
+        "outputId": "b78d4d86-4dd3-4857-9322-651f96fb3a56",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 67
+        }
+      },
+      "source": [
+        "cars_df.loc[cars_df[\"cars\"]==7].groupby (cars_df.hour)[\"hour\"].count().sort_values(ascending = False). head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "hour\n",
+              "13    6\n",
+              "Name: hour, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 70
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "4Vj5JrELADGH",
+        "colab_type": "text"
+      },
+      "source": [
+        "Most popular hour for returning cars is at 13:00 hours"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "KNQ0q2KEAmi8",
+        "colab_type": "text"
+      },
+      "source": [
+        "What is the most popular station Overall"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "v8idWd3EAq8i",
+        "colab_type": "code",
+        "outputId": "77121f2a-3318-4b11-cb0a-6d6cd2e8661f",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 67
+        }
+      },
+      "source": [
+        "cars_df[cars_df[\"kind\"]==\"STATION\"]. groupby(\"address\")[\"address\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "address\n",
+              "8 Avenue de la Porte de Montrouge    13\n",
+              "Name: address, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 78
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "qSttcvioDYke",
+        "colab_type": "text"
+      },
+      "source": [
+        "Most popular station is 8 Avenue de la Porte de Montrouge"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "oZMZvgn9JeJB",
+        "colab_type": "code",
+        "outputId": "64240519-3e45-4e6e-824b-c8727b0d5d3d",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 67
+        }
+      },
+      "source": [
+        "#Most popular pick up hour\n",
+        "cars_df.loc[cars_df[\"cars\"]<7].groupby (cars_df.hour)[\"hour\"].count().sort_values(ascending = False). head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "hour\n",
+              "21    236\n",
+              "Name: hour, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 83
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "W-7u1ZrbDgFu",
+        "colab_type": "text"
+      },
+      "source": [
+        "Most popular Station at most popular Hour"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "CQylLzdUDvT4",
+        "colab_type": "code",
+        "outputId": "cc6df535-e57e-45c4-d1b9-fac5beffdefb",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 67
+        }
+      },
+      "source": [
+        "cars_df[(cars_df[\"kind\"]==\"STATION\") & (cars_df.hour== 13)]. groupby(\"address\")[\"address\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "address\n",
+              "1 rue Maryse BastiÃ©    2\n",
+              "Name: address, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 80
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "w68nsQ8ZEPay",
+        "colab_type": "text"
+      },
+      "source": [
+        "What postal code is most popular for picking Blue cars"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab_type": "code",
+        "outputId": "4ee4c78b-9f8a-4b7c-e8c2-b7cbf1ea5136",
+        "id": "AjTH3Kc6FFZB",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 67
+        }
+      },
+      "source": [
+        "cars_df.loc[cars_df[\"cars\"]<7].groupby(\"postal_code\")[\"postal_code\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "postal_code\n",
+              "75015    274\n",
+              "Name: postal_code, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 82
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "D15Wl8YiGD4x",
+        "colab_type": "text"
+      },
+      "source": [
+        "What postal code is most popular for picking Blue cars at the most popular hour"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_YVd92WDJNu6",
+        "colab_type": "code",
+        "outputId": "2a853ad7-37f1-478b-b532-add801993429",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 67
+        }
+      },
+      "source": [
+        "cars_df.loc[(cars_df[\"cars\"]<7) &(cars_df[\"hour\"] == 21)].groupby(\"postal_code\")[\"postal_code\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "postal_code\n",
+              "75014    16\n",
+              "Name: postal_code, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 84
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "RYstRzcE0p3Q",
+        "colab_type": "text"
+      },
+      "source": [
+        "Using Utilib"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-cL_EunW0t1i",
+        "colab_type": "code",
+        "outputId": "b891b321-f1cd-4dd1-f997-d1c384d4572b",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 68
+        }
+      },
+      "source": [
+        "#Identify the most popular hour of the day for picking up a Utilib in the city of Paris over the month of April 2018.\n",
+        "cars_df[(cars_df[\"city\"]==\"Paris\") & (cars_df[\"utilib_counter\"]<4)& (cars_df.month== 4) & (cars_df.year==2018)]. groupby(\"hour\")[\"hour\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "hour\n",
+              "21    147\n",
+              "Name: hour, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "SRl7KfQL1zYO",
+        "colab_type": "text"
+      },
+      "source": [
+        "Using Utilib 1.4"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0dBAVMCH13RN",
+        "colab_type": "code",
+        "outputId": "2862ef87-7e8b-4353-9296-5b23935a383d",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 68
+        }
+      },
+      "source": [
+        "cars_df[(cars_df[\"city\"]==\"Paris\") & (cars_df[\"utilib_14_counter\"]<5)& (cars_df.month== 4) & (cars_df.year==2018)]. groupby(\"hour\")[\"hour\"].count().sort_values(ascending = False).head(1)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "hour\n",
+              "21    147\n",
+              "Name: hour, dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "tJF-c3OM2Mni",
+        "colab_type": "text"
+      },
+      "source": [
+        "# The most popular pick up time in paris does not change between blue car utilib and utilib 1.4"
+      ]
+    }
+  ]
+}
